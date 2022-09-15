@@ -17,6 +17,7 @@ contract Raffle {
     /* State Variables */
     uint256 private i_enteranceFee;
     address payable[] private s_prayers;
+
     constructor(uint256 enteranceFee) {
         i_enteranceFee = enteranceFee;
     }
@@ -26,17 +27,19 @@ contract Raffle {
         //require (msg.value > i_enteranceFee, "Not Enough ETH!")
 
         // but we will use error codes for gas efficiency since storing strings if supper expensive
-        if (msg.value < i_enteranceFee) {revert Raffle__NotEnoughEthEntered();}
+        if (msg.value < i_enteranceFee) {
+            revert Raffle__NotEnoughEthEntered();
+        }
+        s_prayers.push(payable(msg.sender));
     }
 
     //function pickRandomWinner(){}
 
-    funtion getEnteranceFee() public view returns(uint256) {
+    function getEnteranceFee() public view returns (uint256) {
         return i_enteranceFee;
     }
 
-    funtion getPlayers(uint256 index) public view returns(address) {
+    function getPlayers(uint256 index) public view returns (address) {
         return s_prayers[index];
     }
-
 }
