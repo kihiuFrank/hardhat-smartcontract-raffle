@@ -11,14 +11,21 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.7;
 
+import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
+
 error Raffle__NotEnoughEthEntered();
 
-contract Raffle {
+contract Raffle is VRFConsumerBaseV2 {
     /* State Variables */
     uint256 private i_enteranceFee;
     address payable[] private s_prayers;
 
-    constructor(uint256 enteranceFee) {
+    /* Events */
+    event RaffleEnter(address indexed player);
+
+    constructor(address vrfCoordinatorV2, uint256 enteranceFee)
+        VRFConsumerBaseV2(vrfCoordinatorV2)
+    {
         i_enteranceFee = enteranceFee;
     }
 
@@ -31,10 +38,24 @@ contract Raffle {
             revert Raffle__NotEnoughEthEntered();
         }
         s_prayers.push(payable(msg.sender));
+
+        //Emit an event when we update a dynamic array or mapping
+        //name events with fuction name reversed. in this case event RaffleEnter()
+        emit RaffleEnter(msg.sender);
     }
 
-    //function pickRandomWinner(){}
+    function requestRandomWinner() external {
+        //Request random number
+        // then do something with it
+        // chainlink VRF is a 2 transaction process
+    }
 
+    function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords)
+        internal
+        override
+    {}
+
+    /* view / pure functions */
     function getEnteranceFee() public view returns (uint256) {
         return i_enteranceFee;
     }
