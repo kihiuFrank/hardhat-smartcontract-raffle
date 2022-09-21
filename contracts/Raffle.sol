@@ -193,7 +193,7 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
         return s_players.length;
     }
 
-    function getLatestTimeStamp() public view returns (uint256) {
+    function getLastestTimeStamp() public view returns (uint256) {
         return s_lastTimeStamp;
     }
 

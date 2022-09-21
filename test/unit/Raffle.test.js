@@ -1,5 +1,6 @@
 const { assert, expect } = require("chai")
 const { getNamedAccounts, ethers, network, deployments } = require("hardhat")
+const { r } = require("tar")
 const { developmentChains, networkConfig } = require("../../helper-hardhat-config")
 
 !developmentChains.includes(network.name)
@@ -154,6 +155,76 @@ const { developmentChains, networkConfig } = require("../../helper-hardhat-confi
                   await expect(
                       vrfCoordinatorV2Mock.fulfillRandomWords(1, raffle.address)
                   ).to.be.rejectedWith("nonexistent request")
+              })
+
+              // This test is too big...
+              // This test simulates users entering the raffle and wraps the entire functionality of the raffle
+              // inside a promise that will resolve if everything is successful.
+              // An event listener for the WinnerPicked is set up
+              // Mocks of chainlink keepers and vrf coordinator are used to kickoff this winnerPicked event
+              // All the assertions are done once the WinnerPicked event is fired
+              it("picks winner, resets the lottery, and sends money", async function () {
+                  const additionalEntrants = 3
+                  const startingAccountIndex = 1 // Since deployer = 0
+                  const accounts = await ethers.getSigners()
+                  for (
+                      let i = startingAccountIndex;
+                      i < startingAccountIndex + additionalEntrants;
+                      i++
+                  ) {
+                      const accountConnectedRaffle = raffle.connect(accounts[i]) // Returns a new instance of the Raffle contract connected to player
+                      await accountConnectedRaffle.enterRaffle({ value: raffleEntranceFee })
+                  }
+                  const startingTimestamp = await raffle.getLastestTimeStamp() // stores starting timestamp (before we fire our event)
+
+                  // performUpkeep which will (mock being chainlink keepers) which will kick off calling,
+                  // fulfillRandomWords and we will (mock being the chainlink VRF) as well
+                  // on a testnet, we will  have to wait for the fulfillRandomWords to be called
+                  // we need to simulate that we need to wait for that event to be called
+                  // so we do that by setting up a listener
+                  // and we don't want the test to finish before the listner is done listening so we need to create a new promise.
+
+                  // This will be more important for our staging tests...
+                  await new Promise(async (resolve, reject) => {
+                      raffle.once("WinnerPicked", async () => {
+                          // setting up the event listener for WinnerPicked
+                          console.log("WinnerPicked event fired!")
+                          // assert throws an error if it fails, so we need to wrap
+                          // it in a try/catch so that the promise returns event
+                          // if it fails.
+                          try {
+                              // Now lets get the ending values...
+                              const recentWinner = await raffle.getRecentWinner()
+                              console.log("Winner is; ", recentWinner)
+                              console.log(accounts[2].address)
+                              console.log(accounts[0].address)
+                              console.log(accounts[1].address)
+                              console.log(accounts[3].address)
+                              const raffleState = await raffle.getRaffleState()
+                              const endingTimestamp = await raffle.getLastestTimeStamp()
+                              const numPlayers = await raffle.getNumberOfPlayers()
+                              assert.equal(numPlayers.toString(), "0")
+                              assert.equal(raffleState.toString(), "0")
+                              assert(endingTimestamp > startingTimestamp)
+                          } catch (e) {
+                              reject(e)
+                          }
+
+                          resolve()
+                      })
+                      //Setting up the listener
+
+                      // below we will fire the event, and the listener will pick it up, and resolve
+
+                      // mocking chainlink keepers
+                      const tx = await raffle.performUpkeep([]) //error fix. I had failed to pass in the empty args -> []
+                      const txReceipt = await tx.wait(1)
+                      //mocking the chainlink VRF
+                      await vrfCoordinatorV2Mock.fulfillRandomWords(
+                          txReceipt.events[1].args.requestId,
+                          raffle.address
+                      )
+                  })
               })
           })
       })
