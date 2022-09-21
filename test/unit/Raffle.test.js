@@ -186,6 +186,7 @@ const { developmentChains, networkConfig } = require("../../helper-hardhat-confi
 
                   // This will be more important for our staging tests...
                   await new Promise(async (resolve, reject) => {
+                      //Setting up the listener
                       raffle.once("WinnerPicked", async () => {
                           // setting up the event listener for WinnerPicked
                           console.log("WinnerPicked event fired!")
@@ -203,22 +204,39 @@ const { developmentChains, networkConfig } = require("../../helper-hardhat-confi
                               const raffleState = await raffle.getRaffleState()
                               const endingTimestamp = await raffle.getLastestTimeStamp()
                               const numPlayers = await raffle.getNumberOfPlayers()
+                              const winnerEndingBalance = await accounts[1].getBalance()
                               assert.equal(numPlayers.toString(), "0")
                               assert.equal(raffleState.toString(), "0")
                               assert(endingTimestamp > startingTimestamp)
+                              //make sure winner got paid
+                              assert.equal(
+                                  winnerEndingBalance.toString(),
+                                  winnerStartingBalance // startingBalance + ( (raffleEntranceFee * additionalEntrances) + raffleEntranceFee )
+                                      .add(
+                                          raffleEntranceFee
+                                              .mul(additionalEntrants)
+                                              .add(raffleEntranceFee)
+                                      )
+                                      .toString()
+                              )
                           } catch (e) {
                               reject(e)
                           }
 
                           resolve()
                       })
-                      //Setting up the listener
+                      //Keep it in mind, This section runs then the listener runs after.
 
                       // below we will fire the event, and the listener will pick it up, and resolve
 
                       // mocking chainlink keepers
                       const tx = await raffle.performUpkeep([]) //error fix. I had failed to pass in the empty args -> []
                       const txReceipt = await tx.wait(1)
+
+                      // getting winner balance
+                      // we run test and determined accounts[1] is the winner, from the accounts logs set above.
+                      const winnerStartingBalance = await accounts[1].getBalance()
+
                       //mocking the chainlink VRF
                       await vrfCoordinatorV2Mock.fulfillRandomWords(
                           txReceipt.events[1].args.requestId,
