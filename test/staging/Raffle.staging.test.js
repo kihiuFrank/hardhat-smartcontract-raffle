@@ -11,7 +11,7 @@ developmentChains.includes(network.name)
               //const { deployer } = await getNamedAccounts()
               deployer = (await getNamedAccounts()).deployer
               raffle = await ethers.getContract("Raffle", deployer)
-              raffleEntranceFee = await raffle.getEnteranceFee()
+              raffleEntranceFee = await raffle.getEntranceFee()
           })
 
           describe("fulfillRandomWords", function () {
