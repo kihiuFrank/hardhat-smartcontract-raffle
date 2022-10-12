@@ -78,7 +78,7 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
         // you can do this,
         //require (msg.value > i_enteranceFee, "Not Enough ETH!")
 
-        // but we will use error codes for gas efficiency since storing strings if supper expensive
+        // but we will use error codes for gas efficiency since storing strings is supper expensive
         if (msg.value < i_enteranceFee) {
             revert Raffle__NotEnoughEthEntered();
         }
@@ -103,20 +103,22 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
      * 4.) The Raffle should be in an "open" state
      */
     function checkUpkeep(
-        bytes memory /*checkData*/
+        bytes memory /* checkData */
     )
         public
+        view
         override
         returns (
             bool upkeepNeeded,
             bytes memory /* performData */
         )
     {
-        bool isOpen = (RaffleState.OPEN == s_raffleState);
-        bool timepassed = ((block.timestamp - s_lastTimeStamp) > i_interval);
-        bool hasPlayers = (s_players.length > 0);
+        bool isOpen = RaffleState.OPEN == s_raffleState;
+        bool timePassed = ((block.timestamp - s_lastTimeStamp) > i_interval);
+        bool hasPlayers = s_players.length > 0;
         bool hasBalance = address(this).balance > 0;
-        upkeepNeeded = (isOpen && timepassed && hasPlayers && hasBalance);
+        upkeepNeeded = (timePassed && isOpen && hasBalance && hasPlayers);
+        return (upkeepNeeded, "0x0"); // can we comment this out?
     }
 
     function performUpkeep(
@@ -161,7 +163,7 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
         // reset timestamp
         s_lastTimeStamp = block.timestamp;
         (bool success, ) = recentWinner.call{value: address(this).balance}("");
-        //require (success)
+        // require(success, "Transfer failed");
         if (!success) {
             revert Raffle__TransferFailed();
         }
