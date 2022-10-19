@@ -1,9 +1,3 @@
-# hardhat-smartcontract-raffle
- * This contract is for creating an untamperable decentralized raffle smart contract
- * This implements the Chainlink VRF Version 2 and Chainlink Keepers
-
- <br/>
-This repo has been revamped to work with Goerli. Due to AaveV2 not being deployed on Goerli, it may not work as intended. Please use a mainnet-fork or local network instead of a testnet.
 <br>
 <p align="center">
 <a href="https://chain.link" target="_blank">
@@ -12,9 +6,9 @@ This repo has been revamped to work with Goerli. Due to AaveV2 not being deploye
 </p>
 <br/>
 
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/kihiuFrank/hardhat-defi.git)
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/kihiuFrank/hardhat-smartcontract-raffle.git)
 
-- [Chainlink Hardhat Starter Kit](#chainlink-hardhat-starter-kit)
+- [hardhat-smartcontract-raffle](#hardhat-smartcontract-raffle)
 - [Getting Started](#getting-started)
   - [Requirements](#requirements)
   - [Quickstart](#quickstart)
@@ -33,22 +27,27 @@ This repo has been revamped to work with Goerli. Due to AaveV2 not being deploye
   - [VRF Get a random number](#vrf-get-a-random-number)
   - [Keepers](#keepers)
   - [Verify on Etherscan](#verify-on-etherscan)
+- [View Contracts Size](#view-contracts-size)
 - [Linting](#linting)
 - [Code Formatting](#code-formatting)
 - [Estimating Gas](#estimating-gas)
 - [Code Coverage](#code-coverage)
+- [Fuzzing](#fuzzing)
 - [Contributing](#contributing)
 - [Thank You!](#thank-you)
   - [Resources](#resources)
 
-# Hardhat DeFi
+# # Hardhat Smartcontract Raffle
+This contract is for creating an untamperable decentralized raffle smart contract
+
+This implements the Chainlink VRF Version 2 and Chainlink Keepers
+
  Implementation of the following 4 Chainlink features using the [Hardhat](https://hardhat.org/) development environment:
  - [Chainlink Price Feeds](https://docs.chain.link/docs/using-chainlink-reference-contracts)
  - [Chainlink VRF](https://docs.chain.link/docs/chainlink-vrf)
  - [Chainlink Keepers](https://docs.chain.link/docs/chainlink-keepers/introduction/)
  - [Request & Receive data](https://docs.chain.link/docs/request-and-receive-data)
-
-# Getting Started 
+ # Getting Started 
 
 It's recommended that you've gone through the [hardhat getting started documentation](https://hardhat.org/getting-started/) before proceeding here. 
 
@@ -73,17 +72,13 @@ It's recommended that you've gone through the [hardhat getting started documenta
 After installing all the requirements, run the following:
 
 ```bash
-git clone https://github.com/kihiuFrank/hardhat-defi.git
-cd hardhat-defi
+git clone https://github.com/kihiuFrank/hardhat-smartcontract-raffle.git
+cd hardhat-smartcontract-raffle
 ```
 Then:
-```
-npm install 
-```
-or 
 
 ```
-yarn
+yarn 
 ```
 
 The recommendation is to use npm 7 or later. If you are using an older version of npm, you'll also need to install all the packages used by the toolbox.
@@ -99,18 +94,6 @@ yarn add --dev @nomicfoundation/hardhat-toolbox @nomicfoundation/hardhat-network
 2. You can now do stuff!
 
 ```
-npx hardhat test
-```
-
-or
-
-```
-npm run test
-```
-
-or
-
-```
 yarn test
 ```
 
@@ -120,17 +103,17 @@ To use typescript, run:
 
 ```
 git checkout typescript
-npm install
+yarn
 ```
 
 # Usage
 
-If you run `npx hardhat --help` you'll get an output of all the tasks you can run. 
+If you run `yarn hardhat --help` you'll get an output of all the tasks you can run. 
 
 ## Deploying Contracts
 
 ```
-npm run deploy
+yarn hardhat deploy --network network
 ```
 
 This will deploy your contracts to a local network. Additionally, if on a local network, it will deploy mock Chainlink contracts for you to interact with. If you'd like to interact with your deployed contracts, skip down to [Interacting with Deployed Contracts](#interacting-with-deployed-contracts).
@@ -140,7 +123,7 @@ This will deploy your contracts to a local network. Additionally, if on a local 
 One of the best ways to test and interact with smart contracts is with a local network. To run a local network with all your contracts in it, run the following:
 
 ```
-npx hardhat node
+yarn hardhat node
 ```
 
 You'll get a local blockchain, private keys, contracts deployed (from the `deployment` folder scripts), and an endpoint to potentially add to an EVM wallet. 
@@ -215,39 +198,13 @@ You should now be all setup! You can run any command and just pass the `--networ
 To deploy contracts:
 
 ```
-npm run deploy --network goerli
+yarn hardhat deploy --network goerli 
 ```
 
 To run staging testnet tests
 ```
-npm run test-staging or yarn run test-staging 
+yarn hardhat test --network goerli
 ```
-
-## Forking 
- 
-If you'd like to run tests or on a network that is a [forked network](https://hardhat.org/hardhat-network/guides/mainnet-forking.html)
-1. Set a `MAINNET_RPC_URL` environment variable that connects to the mainnet.
-2. Choose a block number to select a state of the network you are forking and set it as `FORKING_BLOCK_NUMBER` environment variable. If ignored, it will use the latest block each time which can lead to test inconsistency.
-3. Set `enabled` flag to `true`/`false` to enable/disable forking feature
-```
-      forking: {
-        url: MAINNET_RPC_URL,
-        blockNumber: FORKING_BLOCK_NUMBER,
-        enabled: false,
-      }
-```
-
-
-## Auto-Funding
-
-This Starter Kit is configured by default to attempt to auto-fund any newly deployed contract that uses Any-API, to save having to manually fund them after each deployment. The amount in LINK to send as part of this process can be modified in the [helper hardhat Config](helper-hardhat-config.js), and are configurable per network.
-
-| Parameter  | Description                                       | Default Value |
-| ---------- | :------------------------------------------------ | :------------ |
-| fundAmount | Amount of LINK to transfer when funding contracts | 0.1 LINK      |
-
-If you wish to deploy the smart contracts without performing the auto-funding, add an `AUTO_FUND` environment variable, and set it to false. 
-
 
 # Test
 Tests are located in the [test](./test/) directory, and are split between unit tests and staging/testnet tests. Unit tests should only be run on local environments, and staging tests should only run on live environments.
@@ -255,48 +212,17 @@ Tests are located in the [test](./test/) directory, and are split between unit t
 To run unit tests:
 
 ```
-npx hardhat test
-```
-
-or
-
-```
-npm run test
-```
-
-or
-
-```
-yarn test
+yarn hardhat test  
 ```
 
 To run staging tests on Goerli network:
-
 ```
-npx hardhat test --network goerli
-```
-or
-```bash
-npm run test-staging
-```
-
-## Performance optimizations
-
-Since all tests are written in a way to be independent from each other, you can save time by running them in parallel. Make sure that `AUTO_FUND=false` inside `.env` file. There are some limitations with parallel testing, read more about them [here](https://hardhat.org/guides/parallel-tests.html)
-
-To run tests in parallel:
-```
-npx hardhat test --parallel
-```
-or
-```
-npm run test --parallel
+yarn hardhat test --network goerli
 ```
 
 # Interacting with Deployed Contracts
 
 After deploying your contracts, the deployment output will give you the contract addresses as they are deployed. You can then use these contract addresses in conjunction with Hardhat tasks to perform operations on each contract.
-
 
 ## Chainlink Price Feeds
 The Price Feeds consumer contract has one task, to read the latest price of a specified price feed contract
@@ -357,7 +283,7 @@ The AutomationCounter contract is a simple Chainlink Automation enabled contract
 
 
 ```bash
-npx hardhat read-automation-counter --contract insert-contract-address-here --network network
+yarn hardhat read-automation-counter --contract insert-contract-address-here --network network
 ```
 
 ## Verify on Etherscan
@@ -365,22 +291,18 @@ npx hardhat read-automation-counter --contract insert-contract-address-here --ne
 You'll need an `ETHERSCAN_API_KEY` environment variable. You can get one from the [Etherscan API site.](https://etherscan.io/apis). If you have it set, your deploy script will try to verify them by default, but if you want to verify any manually, you can run: 
 
 ```
-npx hardhat verify --network <NETWORK> <CONTRACT_ADDRESS> <CONSTRUCTOR_PARAMETERS>
+yarn hardhat verify --network <NETWORK> <CONTRACT_ADDRESS> <CONSTRUCTOR_PARAMETERS>
 ```
 example:
 
 ```
-npx hardhat verify --network goerli 0x9279791897f112a41FfDa267ff7DbBC46b96c296 "0x9326BFA02ADD2366b30bacB125260Af641031331"
+yarn hardhat verify --network goerli 0x9279791897f112a41FfDa267ff7DbBC46b96c296 "0x9326BFA02ADD2366b30bacB125260Af641031331"
 ```
 
 # Linting
 
 This will [lint](https://stackoverflow.com/questions/8503559/what-is-linting) your smart contracts.  
 
-```
-npm run lint:fix
-```
-or
 ```
 yarn lint:fix
 ```
@@ -395,11 +317,6 @@ yarn lint
 This will format both your javascript and solidity to look nicer. 
 
 ```
-npm run format
-```
-or
-
-```
 yarn format
 ```
 
@@ -408,7 +325,7 @@ yarn format
 To estimate gas, just set a `REPORT_GAS` environment variable to true, and then run:
 
 ```
-npx hardhat test
+yarn hardhat test
 ```
 
 If you'd like to see the gas prices in USD or other currency, add a `COINMARKETCAP_API_KEY` from [Coinmarketcap](https://coinmarketcap.com/api/documentation/v1/).
@@ -417,7 +334,7 @@ If you'd like to see the gas prices in USD or other currency, add a `COINMARKETC
 
 To see a measure in percent of the degree to which the smart contract source code is executed when a particular test suite is run, type
 ```
-npm run coverage
+yarn coverage
 ```
 
 # Contributing
