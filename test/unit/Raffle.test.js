@@ -14,7 +14,7 @@ const { developmentChains, networkConfig } = require("../../helper-hardhat-confi
               await deployments.fixture(["all"])
               raffle = await ethers.getContract("Raffle", deployer)
               vrfCoordinatorV2Mock = await ethers.getContract("VRFCoordinatorV2Mock", deployer)
-              raffleEntranceFee = await raffle.getEnteranceFee()
+              raffleEntranceFee = await raffle.getEntranceFee()
               interval = await raffle.getInterval()
           })
 
